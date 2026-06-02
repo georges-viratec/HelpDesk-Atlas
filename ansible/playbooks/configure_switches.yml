@@ -1,0 +1,25 @@
+---
+# ============================================================
+# PLAYBOOK PRINCIPAL — Configuration des Switches Atlas
+# Usage :
+#   ansible-playbook -i inventory/hosts.yml playbooks/configure_switches.yml --ask-vault-pass
+#   ansible-playbook ... --tags vlans          # seulement les VLANs
+#   ansible-playbook ... --tags security       # seulement le hardening
+#   ansible-playbook ... --limit sw-cisco-3750 # seulement le Cisco
+# ============================================================
+
+- name: "Configuration Cisco Catalyst 3750"
+  hosts: cisco
+  gather_facts: false
+  vars_files:
+    - "../group_vars/vault.yml"
+  roles:
+    - cisco_3750
+
+- name: "Configuration HP ProCurve 2510-24"
+  hosts: procurve
+  gather_facts: false
+  vars_files:
+    - "../group_vars/vault.yml"
+  roles:
+    - procurve_2510
