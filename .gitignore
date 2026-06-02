@@ -1,0 +1,8 @@
+# Secrets
+**/.env
+**/vault.yml
+!**/.env.example        # garder le template
+*.tfvars
+!*.tfvars.example
+.terraform/
+terraform.tfstate*
