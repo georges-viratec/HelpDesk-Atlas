@@ -1,8 +1,9 @@
 # Secrets
 **/.env
 **/vault.yml
-!**/.env.example        # garder le template
+!**/.env.example
 *.tfvars
 !*.tfvars.example
 .terraform/
 terraform.tfstate*
+*.pem
