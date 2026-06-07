@@ -1,0 +1,17 @@
+# Ports trunk vers les Proxmox (adapter selon câblage physique)
+trunk_ports:
+  - GigabitEthernet1/0/5   # PVE1
+  - GigabitEthernet1/0/9   # PVE2
+
+# Port WAN vers la box
+wan_port: GigabitEthernet1/0/1
+
+# VLANs à créer
+vlans:
+  - { id: 10,  name: MANAGEMENT }
+  - { id: 20,  name: CORE_SERVICES }
+  - { id: 30,  name: APPLICATIONS }
+  - { id: 40,  name: DATA_BDD }
+  - { id: 50,  name: STOCKAGE_SAN }
+  - { id: 60,  name: COROSYNC_HA }
+  - { id: 99,  name: WAN_INTERNET }
