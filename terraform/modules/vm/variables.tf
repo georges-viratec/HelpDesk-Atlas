@@ -1,22 +1,66 @@
-variable "pve_endpoint" {
-    description = "The Proxmox VE API endpoint URL."
-    type        = string
-    default     = "https://100.100.137.13:8006/"
+variable "vm_name" {
+  description = "Name of the VM"
+  type        = string
 }
 
-variable "pve_api_token" {
-    description = "The Proxmox VE API token."
-    type        = string
-    sensitive   = true
+variable "pve_node" {
+  description = "Proxmox node to deploy on"
+  type        = string
 }
 
-variable "ssh_public_keys" {
-    description = "The SSH public keys to be added to the virtual machine."
-    type        = list(string)
+variable "vm_id" {
+  description = "VM ID"
+  type        = number
+}
+
+variable "cores" {
+  description = "Number of CPU cores"
+  type        = number
+  default     = 2
+}
+
+variable "memory_mb" {
+  description = "Memory in MB"
+  type        = number
+}
+
+variable "disk_gb" {
+  description = "Disk size in GB"
+  type        = number
+}
+
+variable "disk_datastore" {
+  description = "Datastore for the disk"
+  type        = string
+}
+
+variable "vlan_id" {
+  description = "VLAN ID"
+  type        = number
+}
+
+variable "ip_address" {
+  description = "IP address with prefix (e.g. 10.10.30.10/24)"
+  type        = string
+}
+
+variable "gateway" {
+  description = "Gateway IP"
+  type        = string
+}
+
+variable "ssh_public_key" {
+  description = "SSH public keys"
+  type        = list(string)
 }
 
 variable "ci_password" {
-    description = "The password for the virtual machine."
-    type        = string
-    sensitive   = true
+  description = "Cloud-init password"
+  type        = string
+  sensitive   = true
+}
+
+variable "template_id" {
+  description = "Template VM ID to clone"
+  type        = number
 }

@@ -1,0 +1,9 @@
+# Secrets
+**/.env
+**/vault.yml
+!**/.env.example
+*.tfvars
+!*.tfvars.example
+.terraform/
+terraform.tfstate*
+*.pem
