@@ -13,11 +13,11 @@ resource "proxmox_virtual_environment_vm" "this" {
   node_name = var.pve_node
   vm_id     = var.vm_id
 
-  # Clone depuis le template Debian 13
   clone {
-    vm_id   = var.template_id
-    full    = true
-    retries = 3
+    vm_id     = var.template_id
+    full      = true
+    retries   = 3
+    node_name = var.pve_node
   }
 
   cpu {
@@ -33,6 +33,8 @@ resource "proxmox_virtual_environment_vm" "this" {
     datastore_id = var.disk_datastore
     size         = var.disk_gb
     interface    = "scsi0"
+    discard      = "on"
+    file_format  = "raw"
   }
 
   network_device {
@@ -41,6 +43,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   }
 
   initialization {
+    datastore_id = var.disk_datastore
     ip_config {
       ipv4 {
         address = var.ip_address
@@ -48,7 +51,7 @@ resource "proxmox_virtual_environment_vm" "this" {
       }
     }
     user_account {
-      keys     = [var.ssh_public_key]
+      keys     = var.ssh_public_key
       password = var.ci_password
     }
   }
@@ -57,4 +60,9 @@ resource "proxmox_virtual_environment_vm" "this" {
     enabled = true
   }
 
+  operating_system {
+    type = "l26"
+  }
+
+  on_boot = true
 }
