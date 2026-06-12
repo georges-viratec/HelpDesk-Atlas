@@ -46,7 +46,7 @@ module "k3s_master_2" {
   gateway        = "10.10.30.254"
   ssh_public_key = var.ssh_public_keys
   ci_password    = var.ci_password
-  template_id    = 8000
+  template_id    = 8001
 }
 
 # ── K3S WORKER 2 ───────────────────────────────
@@ -63,7 +63,7 @@ module "k3s_worker_2" {
   gateway        = "10.10.30.254"
   ssh_public_key = var.ssh_public_keys
   ci_password    = var.ci_password
-  template_id    = 8000
+  template_id    = 8001
 }
 
 # ── GALERA CLUSTER ─────────────────────────────
@@ -97,7 +97,7 @@ module "galera_2" {
   gateway        = "10.10.40.254"
   ssh_public_key = var.ssh_public_keys
   ci_password    = var.ci_password
-  template_id    = 8000
+  template_id    = 8001
 }
 
 module "galera_3" {
@@ -131,7 +131,7 @@ module "vault" {
   gateway        = "10.10.10.254"
   ssh_public_key = var.ssh_public_keys
   ci_password    = var.ci_password
-  template_id    = 8000
+  template_id    = 8001
 }
 
 # ── PROXMOX BACKUP SERVER ──────────────────────
@@ -149,5 +149,5 @@ module "pbs" {
   gateway        = "10.10.10.254"
   ssh_public_key = var.ssh_public_keys
   ci_password    = var.ci_password
-  template_id    = 8000
+  template_id    = 8001
 }
