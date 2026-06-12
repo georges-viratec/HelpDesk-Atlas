@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: glpi-data-pvc
+  namespace: glpi
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-atlas
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: glpi-plugins-pvc
+  namespace: glpi
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-atlas
+  resources:
+    requests:
+      storage: 5Gi

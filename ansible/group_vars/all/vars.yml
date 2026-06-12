@@ -1,0 +1,20 @@
+---
+# Variables globales
+ansible_user: debian
+ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+ansible_python_interpreter: /usr/bin/python3
+
+# DNS
+dns_server: 10.10.20.53
+
+# NTP
+ntp_servers:
+  - 10.10.10.254
+
+# Secrets (définis dans vault.yml)
+mariadb_root_password: "{{ vault_mariadb_root_password }}"
+mariadb_glpi_password: "{{ vault_mariadb_glpi_password }}"
+mariadb_keycloak_password: "{{ vault_mariadb_keycloak_password }}"
+mariadb_gitlab_password: "{{ vault_mariadb_gitlab_password }}"
+grafana_password: "{{ vault_grafana_password }}"
+keycloak_admin_password: "{{ vault_keycloak_admin_password }}"

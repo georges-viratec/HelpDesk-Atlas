@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+        - name: gitlab
+          image: gitlab/gitlab-ce:17.1.1-ce.0
+          ports:
+            - containerPort: 80
+            - containerPort: 22
+          env:
+            - name: GITLAB_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gitlab-secret
+                  key: db-password
+            - name: GITLAB_OMNIBUS_CONFIG
+              value: |
+                external_url 'http://gitlab.atlas.local'
+                gitlab_rails['db_adapter'] = 'mysql2'
+                gitlab_rails['db_host'] = '10.10.40.10'
+                gitlab_rails['db_port'] = 3306
+                gitlab_rails['db_database'] = 'gitlab'
+                gitlab_rails['db_username'] = 'gitlab'
+                gitlab_rails['db_password'] = ENV['GITLAB_DB_PASSWORD']
+                gitlab_rails['smtp_enable'] = true
+                gitlab_rails['smtp_address'] = '10.10.20.25'
+                gitlab_rails['smtp_port'] = 25
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+          volumeMounts:
+            - name: gitlab-config
+              mountPath: /etc/gitlab
+            - name: gitlab-data
+              mountPath: /var/opt/gitlab
+            - name: gitlab-logs
+              mountPath: /var/log/gitlab
+      volumes:
+        - name: gitlab-config
+          persistentVolumeClaim:
+            claimName: gitlab-config-pvc
+        - name: gitlab-data
+          persistentVolumeClaim:
+            claimName: gitlab-data-pvc
+        - name: gitlab-logs
+          persistentVolumeClaim:
+            claimName: gitlab-logs-pvc

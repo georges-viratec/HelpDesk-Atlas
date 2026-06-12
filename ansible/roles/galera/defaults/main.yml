@@ -1,0 +1,11 @@
+---
+galera_cluster_name: "atlas-galera"
+galera_nodes:
+  - 10.10.40.11
+  - 10.10.40.12
+  - 10.10.40.13
+galera_node_address: "{{ ansible_host }}"
+mariadb_root_password: "{{ vault_mariadb_root_password }}"
+mariadb_glpi_password: "{{ vault_mariadb_glpi_password }}"
+mariadb_keycloak_password: "{{ vault_mariadb_keycloak_password }}"
+mariadb_gitlab_password: "{{ vault_mariadb_gitlab_password }}"

@@ -1,0 +1,10 @@
+---
+# Galera cluster
+galera_cluster_name: "atlas-galera"
+galera_vip: "10.10.40.10"
+galera_nodes:
+  - 10.10.40.11
+  - 10.10.40.12
+  - 10.10.40.13
+mariadb_root_password: "{{ vault_mariadb_root_password }}"
+mariadb_galera_password: "{{ vault_mariadb_galera_password }}"

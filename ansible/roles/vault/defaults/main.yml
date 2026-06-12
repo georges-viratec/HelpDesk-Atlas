@@ -1,0 +1,10 @@
+---
+vault_version: "1.17.0"
+vault_ip: "10.10.10.101"
+vault_port: 8200
+vault_storage_path: "/opt/vault/data"
+vault_config_path: "/etc/vault.d"
+vault_user: "vault"
+vault_group: "vault"
+vault_tls_cert_file: "/opt/vault/tls/vault.crt"
+vault_tls_key_file: "/opt/vault/tls/vault.key"
