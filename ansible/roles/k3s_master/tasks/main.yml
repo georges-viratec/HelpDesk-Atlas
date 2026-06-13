@@ -1,0 +1,61 @@
+---
+- name: Installer les dépendances
+  apt:
+    name:
+      - curl
+      - open-iscsi
+      - nfs-common
+    state: present
+    update_cache: yes
+
+- name: Vérifier si K3s est déjà installé
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+
+- name: Installer K3s master primaire (init cluster)
+  shell: |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server \
+      --cluster-init \
+      --tls-san {{ k3s_vip }} \
+      --tls-san {{ k3s_master_ip }} \
+      --disable {{ k3s_disable | join(' --disable ') }} \
+      --flannel-backend {{ k3s_flannel_backend }}
+  when:
+    - not k3s_binary.stat.exists
+    - inventory_hostname == 'vm-k3s-master'
+
+- name: Attendre que K3s soit prêt
+  wait_for:
+    path: /var/lib/rancher/k3s/server/node-token
+    timeout: 120
+  when: inventory_hostname == 'vm-k3s-master'
+
+- name: Récupérer le token K3s
+  slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  register: k3s_token_raw
+  when: inventory_hostname == 'vm-k3s-master'
+
+- name: Stocker le token comme fact global
+  set_fact:
+    k3s_token: "{{ k3s_token_raw.content | b64decode | trim }}"
+  when: inventory_hostname == 'vm-k3s-master'
+
+- name: Installer K3s master secondaire (rejoindre cluster)
+  shell: |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server \
+      --server https://{{ k3s_master_ip }}:6443 \
+      --token {{ hostvars['vm-k3s-master']['k3s_token'] }} \
+      --tls-san {{ k3s_vip }} \
+      --disable {{ k3s_disable | join(' --disable ') }} \
+      --flannel-backend {{ k3s_flannel_backend }}
+  when:
+    - not k3s_binary.stat.exists
+    - inventory_hostname == 'vm-k3s-master-2'
+
+- name: Vérifier que K3s est actif
+  systemd:
+    name: k3s
+    state: started
+    enabled: yes

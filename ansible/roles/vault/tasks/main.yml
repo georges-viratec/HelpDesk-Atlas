@@ -1,0 +1,80 @@
+---
+- name: Installer les dépendances
+  apt:
+    name:
+      - curl
+      - unzip
+      - gpg
+    state: present
+    update_cache: yes
+
+- name: Ajouter la clé GPG HashiCorp
+  shell: |
+    curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+- name: Ajouter le repo HashiCorp
+  shell: |
+    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
+    > /etc/apt/sources.list.d/hashicorp.list
+  args:
+    creates: /etc/apt/sources.list.d/hashicorp.list
+
+- name: Installer Vault
+  apt:
+    name: vault
+    state: present
+    update_cache: yes
+
+- name: Créer le répertoire de stockage
+  file:
+    path: "{{ vault_storage_path }}"
+    state: directory
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: '0750'
+
+- name: Créer le répertoire TLS
+  file:
+    path: "/opt/vault/tls"
+    state: directory
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: '0750'
+
+- name: Générer un certificat TLS auto-signé pour Vault
+  command: >
+    openssl req -x509 -newkey rsa:4096 -nodes
+    -keyout {{ vault_tls_key_file }}
+    -out {{ vault_tls_cert_file }}
+    -days 3650
+    -subj "/CN={{ vault_ip }}/O=Atlas/C=FR"
+    -addext "subjectAltName=IP:{{ vault_ip }}"
+  args:
+    creates: "{{ vault_tls_cert_file }}"
+
+- name: Fixer les permissions du certificat TLS
+  file:
+    path: "{{ item }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: '0640'
+  loop:
+    - "{{ vault_tls_cert_file }}"
+    - "{{ vault_tls_key_file }}"
+
+- name: Déployer la config Vault
+  template:
+    src: vault.hcl.j2
+    dest: "{{ vault_config_path }}/vault.hcl"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: '0640'
+  notify: restart vault
+
+- name: Démarrer et activer Vault
+  systemd:
+    name: vault
+    state: started
+    enabled: yes

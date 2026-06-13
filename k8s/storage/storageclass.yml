@@ -1,0 +1,17 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-atlas
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: 10.10.10.20
+  share: /mnt/atlas-storage/nfs-k8s
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=4.1
+  - hard
+  - intr

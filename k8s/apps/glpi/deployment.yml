@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: glpi
+  namespace: glpi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: glpi
+  template:
+    metadata:
+      labels:
+        app: glpi
+    spec:
+      containers:
+        - name: glpi
+          image: diouxx/glpi:10.0.16
+          ports:
+            - containerPort: 80
+          env:
+            - name: MARIADB_HOST
+              value: "10.10.40.10"
+            - name: MARIADB_PORT
+              value: "3306"
+            - name: MARIADB_DATABASE
+              value: "glpi"
+            - name: MARIADB_USER
+              value: "glpi"
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: glpi-secret
+                  key: mariadb-password
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          volumeMounts:
+            - name: glpi-data
+              mountPath: /var/www/html/glpi/files
+            - name: glpi-plugins
+              mountPath: /var/www/html/glpi/plugins
+      volumes:
+        - name: glpi-data
+          persistentVolumeClaim:
+            claimName: glpi-data-pvc
+        - name: glpi-plugins
+          persistentVolumeClaim:
+            claimName: glpi-plugins-pvc

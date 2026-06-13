@@ -1,0 +1,13 @@
+---
+- name: Déployer K3s masters
+  hosts: k3s_masters
+  become: yes
+  serial: 1
+  roles:
+    - k3s_master
+
+- name: Déployer K3s workers
+  hosts: k3s_workers
+  become: yes
+  roles:
+    - k3s_worker

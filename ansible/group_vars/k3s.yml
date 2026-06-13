@@ -1,0 +1,11 @@
+---
+# K3s cluster
+k3s_version: "v1.32.0+k3s1"
+k3s_master_ip: "10.10.30.10"
+k3s_vip: "10.10.30.100"
+k3s_token_file: /var/lib/rancher/k3s/server/node-token
+kubeconfig_path: /etc/rancher/k3s/k3s.yaml
+
+# NFS StorageClass
+nfs_server: "10.10.10.20"
+nfs_path: "/mnt/atlas-storage/nfs-k8s"

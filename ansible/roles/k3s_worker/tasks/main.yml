@@ -1,0 +1,27 @@
+---
+- name: Installer les dépendances
+  apt:
+    name:
+      - curl
+      - open-iscsi
+      - nfs-common
+    state: present
+    update_cache: yes
+
+- name: Vérifier si K3s agent est déjà installé
+  stat:
+    path: /usr/local/bin/k3s
+  register: k3s_binary
+
+- name: Installer K3s worker
+  shell: |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - agent \
+      --server https://{{ k3s_master_ip }}:6443 \
+      --token {{ hostvars['vm-k3s-master']['k3s_token'] }}
+  when: not k3s_binary.stat.exists
+
+- name: Vérifier que K3s agent est actif
+  systemd:
+    name: k3s-agent
+    state: started
+    enabled: yes

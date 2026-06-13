@@ -6,4 +6,6 @@
 !*.tfvars.example
 .terraform/
 terraform.tfstate*
-*.pem
+*.pem# Secrets K8s
+k8s/apps/*/secret.yml
+k8s/apps/monitoring/*/secret.yml

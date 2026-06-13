@@ -1,0 +1,100 @@
+---
+- name: Installer MariaDB et Galera
+  apt:
+    name:
+      - mariadb-server
+      - mariadb-client
+      - galera-4
+      - python3-pymysql
+    state: present
+    update_cache: yes
+
+- name: Arrêter MariaDB
+  systemd:
+    name: mariadb
+    state: stopped
+
+- name: Déployer la config Galera
+  template:
+    src: galera.cnf.j2
+    dest: /etc/mysql/mariadb.conf.d/99-galera.cnf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart mariadb
+
+- name: Initialiser le cluster sur le noeud primaire
+  shell: galera_new_cluster
+  when: inventory_hostname == 'vm-galera-1'
+
+- name: Démarrer MariaDB sur les autres noeuds
+  systemd:
+    name: mariadb
+    state: started
+    enabled: yes
+  when: inventory_hostname != 'vm-galera-1'
+
+- name: Sécuriser MariaDB (root password)
+  mysql_user:
+    name: root
+    password: "{{ mariadb_root_password }}"
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    state: present
+  when: inventory_hostname == 'vm-galera-1'
+
+- name: Créer la base GLPI
+  mysql_db:
+    name: glpi
+    state: present
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+  when: inventory_hostname == 'vm-galera-1'
+
+- name: Créer l'utilisateur GLPI
+  mysql_user:
+    name: glpi
+    password: "{{ vault_mariadb_glpi_password }}"
+    priv: "glpi.*:ALL"
+    host: "10.10.30.%"
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    state: present
+  when: inventory_hostname == 'vm-galera-1'
+
+- name: Créer la base Keycloak
+  mysql_db:
+    name: keycloak
+    state: present
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+  when: inventory_hostname == 'vm-galera-1'
+
+- name: Créer l'utilisateur Keycloak
+  mysql_user:
+    name: keycloak
+    password: "{{ vault_mariadb_keycloak_password }}"
+    priv: "keycloak.*:ALL"
+    host: "10.10.30.%"
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    state: present
+  when: inventory_hostname == 'vm-galera-1'
+
+- name: Créer la base GitLab
+  mysql_db:
+    name: gitlab
+    state: present
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+  when: inventory_hostname == 'vm-galera-1'
+
+- name: Créer l'utilisateur GitLab
+  mysql_user:
+    name: gitlab
+    password: "{{ vault_mariadb_gitlab_password }}"
+    priv: "gitlab.*:ALL"
+    host: "10.10.30.%"
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
+    state: present
+  when: inventory_hostname == 'vm-galera-1'

@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: ingress-nginx
+  namespace: kube-system
+spec:
+  chart: ingress-nginx
+  repo: https://kubernetes.github.io/ingress-nginx
+  targetNamespace: ingress-nginx
+  valuesContent: |-
+    controller:
+      service:
+        loadBalancerIP: 10.10.30.200
+      config:
+        proxy-body-size: "512m"
+        proxy-read-timeout: "600"

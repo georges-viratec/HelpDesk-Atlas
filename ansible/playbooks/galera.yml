@@ -1,0 +1,7 @@
+---
+- name: Déployer le cluster Galera
+  hosts: galera
+  become: yes
+  serial: 1
+  roles:
+    - galera
